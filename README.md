@@ -10,7 +10,7 @@ psql_engine = "postgrsql+psycopg2://user:password@host:port/dbname"
 mysql_engine = "mysql+pymysql://user:passwor@host:port/dbname"
 
 engine = create_engine(psql_engine, pool_size=10,
-                        max_overflow=20, pool_recycle=1800)
+                        max_overflow=20, pool_recycle=1800, pool_pre_ping=True)
 # 심화내용 1. 커넥션 풀링 사용 : 대규모 트래픽이나 배치 작업에 활용 가능
 # poolsize : 최대 커넥션 수, max_overflow : pool_size를 초과해 생성할 수 있는 커넥션 수, pool_recycle : 커넥션 재사용 시간(초)
 
@@ -40,7 +40,7 @@ class User(base):
   name = Column(String)
   age = Column(Integer)
 
-Session = sessionmaker()
+Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = Session()
 # ORM 쿼리로 데이터 조회 후 DataFrame 저장
 users = session.query(User).filter(User.age > 20).all()
